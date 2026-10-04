@@ -1,0 +1,20 @@
+# --- Build artifacts (py2app) ---
+build/
+dist/
+*.egg-info/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# --- Tools ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- OS ---
+.DS_Store

@@ -1,0 +1,10 @@
+# Runtime dependencies. rumps itself depends on pyobjc-framework-Cocoa,
+# but it's pinned explicitly too since settings_window.py imports
+# AppKit/Foundation directly for the native folder picker.
+rumps>=0.4,<0.5
+pyobjc-framework-Cocoa>=10,<12
+
+# Only needed to build the standalone .app bundle (setup.py py2app) -
+# not required to just run `python -m ibroadcast_sync_menubar` during
+# development.
+py2app>=0.28,<0.29

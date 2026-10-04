@@ -1,0 +1,94 @@
+[project]
+name = "ibroadcast-sync-menubar"
+version = "0.1.0"
+description = "Compagnon macOS (barre de menu) pour ibroadcast-sync : lancer une synchro et gérer la planification, sans terminal."
+requires-python = ">=3.9"
+dependencies = [
+    "rumps>=0.4,<0.5",
+    "pyobjc-framework-Cocoa>=10,<12",
+]
+
+[project.scripts]
+ibroadcast-sync-menubar = "ibroadcast_sync_menubar.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ibroadcast_sync_menubar*"]
+
+# --------------------------------------------------------------------------
+# Pytest - only the pure-logic modules are exercised (see README.md):
+# config.py, status.py, sync_runner.py (its two builder functions, not
+# start_sync() itself) and launchd_manager.py's plist templating.
+# app.py and settings_window.py (rumps/AppKit glue) have no tests here -
+# there's no macOS/PyObjC runtime in CI to actually exercise them.
+# --------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# --------------------------------------------------------------------------
+# mypy - https://mypy.readthedocs.io/
+# --------------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.9"
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+# rumps/PyObjC aren't installable outside macOS (and aren't installed
+# here) - treated as untyped (Any) rather than excluding app.py/
+# settings_window.py outright, so the rest of their code (the plain
+# Python logic around the AppKit/rumps calls) still gets checked.
+module = [
+    "rumps",
+    "rumps.*",
+    "AppKit",
+    "AppKit.*",
+    "Foundation",
+    "Foundation.*",
+    "PyObjCTools",
+    "PyObjCTools.*",
+    "objc",
+    "objc.*",
+]
+ignore_missing_imports = true
+
+# --------------------------------------------------------------------------
+# Ruff (linter + formatter) - https://docs.astral.sh/ruff/
+# --------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (import sorting)
+    "B",    # flake8-bugbear (common bug patterns)
+    "UP",   # pyupgrade (modern syntax for the target Python version)
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "N",    # pep8-naming
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "E501",  # line length - the formatter handles wrapping where it can
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ibroadcast_sync_menubar"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
