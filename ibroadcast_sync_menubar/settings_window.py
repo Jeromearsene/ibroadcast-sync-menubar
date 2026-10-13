@@ -18,7 +18,7 @@ to actually exercise it outside a real Mac. It's still checked with
 
 from __future__ import annotations
 
-from AppKit import NSOpenPanel
+from AppKit import NSApp, NSOpenPanel
 from Foundation import NSURL
 
 
@@ -35,6 +35,14 @@ def choose_project_folder(start_path: str = "") -> str | None:
     panel.setPrompt_("Choisir")
     if start_path:
         panel.setDirectoryURL_(NSURL.fileURLWithPath_(start_path))
+
+    # This app runs with LSUIElement=True (see setup.py) so it has no Dock
+    # icon and is never activated by macOS on its own. Without this, the
+    # panel opens but never reliably becomes key: clicking a row to
+    # navigate into a subfolder gets treated as ending the modal session
+    # instead of as a navigation click, so the panel appears to close on
+    # the first click into any folder. Activating the app first fixes it.
+    NSApp().activateIgnoringOtherApps_(True)
 
     if panel.runModal():  # NSModalResponseOK
         urls = panel.URLs()
